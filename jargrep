@@ -9,8 +9,12 @@ DEPENDENCY=$2
 
 process_plugin() {
 	local plugin=$1
-	mkdir tmp
-	jar -xf $jar META-INF/plugin.xml -dir tmp
+	local tmp
+	local cache
+	cache=${plugin##*/}
+	tmp=tmp/$cache
+	mkdir -p $tmp
+	jar -x --dir $tmp -f $plugin META-INF/plugin.xml
 	grep -r $DEPENDENCY tmp &>/dev/null
 	if [ $? -eq 0 ]; then
 		echo "$plugin has $DEPENDENCY" 
