@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+
+
+shopt -s globstar nullglob
+
+DIR=$1
+DEPENDENCY=$2
+
+process_plugin() {
+	local plugin=$1
+	mkdir tmp
+	jar -xf $jar META-INF/plugin.xml -dir tmp
+	grep -r $DEPENDENCY tmp &>/dev/null
+	if [ $? -eq 0 ]; then
+		echo "$plugin has $DEPENDENCY" 
+	fi
+	rm -rf tmp
+}
+
+
+process_jar_file() {
+	local jar=$1
+	jar -tf $jar | grep plugin.xml &>/dev/null
+	
+	if [ $? -eq 0 ]; then
+		process_plugin $jar
+	fi
+	
+}
+
+
+files=($DIR/**/*.jar)
+len=${#files[@]}
+
+echo "Processing $len files"
+
+
+for jar in ${files[@]}; do
+
+	process_jar_file $jar
+done
+
